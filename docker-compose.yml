@@ -1,0 +1,9 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "18080:18080"
+    env_file:
+      - .env
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
