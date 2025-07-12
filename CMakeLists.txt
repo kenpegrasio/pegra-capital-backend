@@ -20,14 +20,36 @@ FetchContent_Declare(Crow
 )
 FetchContent_MakeAvailable(Crow)
 
+FetchContent_Declare(
+    jwt-cpp
+    GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
+    GIT_TAG v0.6.0
+)
+FetchContent_MakeAvailable(jwt-cpp)
+
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 
-add_executable(Pegra main.cpp)
+add_executable(Pegra
+    src/main.cpp
+    src/bcrypt/bcrypt.c
+    src/bcrypt/libbcrypt/crypt_blowfish/crypt_blowfish.c
+    src/bcrypt/libbcrypt/crypt_blowfish/crypt_gensalt.c
+    src/bcrypt/libbcrypt/crypt_blowfish/wrapper.c
+    src/db/connect.cpp
+    src/routes/user.cpp
+)
+
+target_include_directories(Pegra PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bcrypt/libbcrypt
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bcrypt/libbcrypt/crypt_blowfish
+)
 
 target_link_libraries(Pegra 
     PUBLIC 
     Crow::Crow 
     mongo::mongocxx_shared
     mongo::bsoncxx_shared
+    jwt-cpp::jwt-cpp
 )
