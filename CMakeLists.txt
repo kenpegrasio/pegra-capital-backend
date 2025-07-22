@@ -16,7 +16,7 @@ include(FetchContent)
 
 FetchContent_Declare(Crow
     GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
-    GIT_TAG v1.1.0
+    GIT_TAG v1.2.1
 )
 FetchContent_MakeAvailable(Crow)
 
@@ -32,18 +32,18 @@ find_package(bsoncxx REQUIRED)
 
 add_executable(Pegra
     src/main.cpp
-    src/bcrypt/bcrypt.c
-    src/bcrypt/libbcrypt/crypt_blowfish/crypt_blowfish.c
-    src/bcrypt/libbcrypt/crypt_blowfish/crypt_gensalt.c
-    src/bcrypt/libbcrypt/crypt_blowfish/wrapper.c
     src/db/connect.cpp
-    src/routes/user.cpp
+
+    third_party/bcrypt/bcrypt.c
+    third_party/bcrypt/crypt_blowfish/wrapper.c
+    third_party/bcrypt/crypt_blowfish/crypt_blowfish.c
+    third_party/bcrypt/crypt_blowfish/crypt_gensalt.c
 )
 
 target_include_directories(Pegra PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/bcrypt/libbcrypt
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/bcrypt/libbcrypt/crypt_blowfish
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bcrypt
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bcrypt/crypt_blowfish
 )
 
 target_link_libraries(Pegra 
