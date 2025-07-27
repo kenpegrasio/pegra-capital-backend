@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
 if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 NEW)
+  cmake_policy(SET CMP0167 NEW)
 endif()
 
 include(FetchContent)
@@ -27,12 +27,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(jwt-cpp)
 
+FetchContent_Declare(
+  curl
+  GIT_REPOSITORY https://github.com/curl/curl.git
+  GIT_TAG        curl-8_8_0  # You can change this to a newer tag
+)
+FetchContent_MakeAvailable(curl)
+
+FetchContent_Declare(
+  libxml2
+  GIT_REPOSITORY https://gitlab.gnome.org/GNOME/libxml2.git
+  GIT_TAG        v2.12.5  # Latest as of 2024
+)
+set(LIBXML2_WITH_PYTHON OFF CACHE BOOL "" FORCE) # Disable Python bindings
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)   # Optional: build static libs
+FetchContent_MakeAvailable(libxml2)
+
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
 
 add_executable(Pegra
     src/main.cpp
     src/db/connect.cpp
+    src/routes/scrapeRoute.cpp
 
     third_party/bcrypt/bcrypt.c
     third_party/bcrypt/crypt_blowfish/wrapper.c
@@ -46,10 +63,12 @@ target_include_directories(Pegra PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bcrypt/crypt_blowfish
 )
 
-target_link_libraries(Pegra 
-    PUBLIC 
-    Crow::Crow 
+target_link_libraries(Pegra
+    PUBLIC
+    Crow::Crow
     mongo::mongocxx_shared
     mongo::bsoncxx_shared
     jwt-cpp::jwt-cpp
+    libcurl
+    xml2
 )
