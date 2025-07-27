@@ -34,17 +34,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(curl)
 
-FetchContent_Declare(
-  libxml2
-  GIT_REPOSITORY https://gitlab.gnome.org/GNOME/libxml2.git
-  GIT_TAG        v2.12.5  # Latest as of 2024
-)
-set(LIBXML2_WITH_PYTHON OFF CACHE BOOL "" FORCE) # Disable Python bindings
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)   # Optional: build static libs
-FetchContent_MakeAvailable(libxml2)
-
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
+find_package(LibXml2 REQUIRED)
 
 add_executable(Pegra
     src/main.cpp
@@ -70,5 +62,5 @@ target_link_libraries(Pegra
     mongo::bsoncxx_shared
     jwt-cpp::jwt-cpp
     libcurl
-    xml2
+    LibXml2::LibXml2
 )
