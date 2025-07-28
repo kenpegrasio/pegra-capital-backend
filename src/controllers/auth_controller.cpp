@@ -41,11 +41,7 @@ void handle_register(const crow::request& req, crow::response& res,
   std::string password = body["password"].s();
   std::string name = body["name"].s();
 
-  char salt[BCRYPT_HASHSIZE];
-  bcrypt_gensalt(12, salt);
-  char hash[BCRYPT_HASHSIZE];
-  bcrypt_hashpw(password.c_str(), salt, hash);
-  std::string hashed_password(hash);
+  std::string hashed_password = hash(password);
 
   auto email_existing = users.find_one(make_document(kvp("email", email)));
   if (email_existing) {
@@ -76,8 +72,6 @@ void handle_register(const crow::request& req, crow::response& res,
 
 void handle_login(const crow::request& req, crow::response& res,
                   mongocxx::database& db) {
-  const char* jwt_secret = getenv("JWT_SECRET");
-
   mongocxx::collection users = db["users"];
   auto body = crow::json::load(req.body);
 
@@ -118,21 +112,14 @@ void handle_login(const crow::request& req, crow::response& res,
 
   auto element = user->view()["password"];
   std::string stored_hash = element.get_string().value.to_string();
-  int valid = bcrypt_checkpw(password.c_str(), stored_hash.c_str());
-  if (valid != 0) {
+  if (!check_password(password, stored_hash)) {
     res.code = 401;
     res.body = "Incorrect Password";
     res.end();
     return;
   }
 
-  auto token = jwt::create()
-                   .set_issuer("pegra")
-                   .set_subject(emailOrUsername)
-                   .set_issued_at(std::chrono::system_clock::now())
-                   .set_expires_at(std::chrono::system_clock::now() +
-                                   std::chrono::minutes{60})
-                   .sign(jwt::algorithm::hs256(jwt_secret));
+  auto token = create_token(emailOrUsername);
 
   crow::json::wvalue json_res;
   json_res["token"] = token;
@@ -157,12 +144,7 @@ crow::response handle_me(const crow::request& req, mongocxx::database& db) {
   std::string token = auth_header.substr(7);
 
   try {
-    auto decoded = jwt::decode(token);
-    auto verifier = jwt::verify()
-                        .allow_algorithm(jwt::algorithm::hs256{jwt_secret})
-                        .with_issuer("pegra");
-
-    verifier.verify(decoded);
+    auto decoded = verify_token(token);
 
     std::string emailOrUsername = decoded.get_subject();
     mongocxx::collection users = db["users"];

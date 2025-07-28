@@ -9,8 +9,9 @@
 #include <bsoncxx/types.hpp>
 #include <mongocxx/database.hpp>
 
-#include "bcrypt.h"
 #include "../utils/env_manager.h"
+#include "../utils/jwt_manager.h"
+#include "../utils/bcrypt_manager.h"
 
 using bsoncxx::builder::basic::array;
 using bsoncxx::builder::basic::kvp;

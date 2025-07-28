@@ -44,6 +44,9 @@ add_executable(Pegra
     src/routes/scrapeRoute.cpp
     src/routes/auth_routes.cpp
     src/controllers/auth_controller.cpp
+    src/utils/jwt_manager.cpp
+    src/utils/env_manager.cpp
+    src/utils/bcrypt_manager.cpp
 
     third_party/bcrypt/bcrypt.c
     third_party/bcrypt/crypt_blowfish/wrapper.c
