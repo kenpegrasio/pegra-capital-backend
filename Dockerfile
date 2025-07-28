@@ -13,7 +13,10 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     libcurl4-openssl-dev \
     ca-certificates \
-    libasio-dev
+    libasio-dev \ 
+    liblzma-dev \
+    zlib1g-dev \
+    libxml2-dev
 
 # Install MongoDB C Driver
 WORKDIR /tmp
