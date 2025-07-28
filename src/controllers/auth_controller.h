@@ -9,9 +9,9 @@
 #include <bsoncxx/types.hpp>
 #include <mongocxx/database.hpp>
 
+#include "../utils/bcrypt_manager.h"
 #include "../utils/env_manager.h"
 #include "../utils/jwt_manager.h"
-#include "../utils/bcrypt_manager.h"
 
 using bsoncxx::builder::basic::array;
 using bsoncxx::builder::basic::kvp;
@@ -22,3 +22,5 @@ void handle_register(const crow::request& req, crow::response& res,
 void handle_login(const crow::request& req, crow::response& res,
                   mongocxx::database& db);
 crow::response handle_me(const crow::request& req, mongocxx::database& db);
+void handle_update_metamask(const crow::request& req, crow::response& res,
+                            mongocxx::database& db);
