@@ -42,6 +42,8 @@ add_executable(Pegra
     src/main.cpp
     src/db/connect.cpp
     src/routes/scrapeRoute.cpp
+    src/routes/auth_routes.cpp
+    src/controllers/auth_controller.cpp
 
     third_party/bcrypt/bcrypt.c
     third_party/bcrypt/crypt_blowfish/wrapper.c
