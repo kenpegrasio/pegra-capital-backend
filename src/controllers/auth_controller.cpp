@@ -1,7 +1,7 @@
 #include "auth_controller.h"
 
-void handle_register(const crow::request& req, crow::response& res,
-                     mongocxx::database& db) {
+void handle_register(const crow::request &req, crow::response &res,
+                     mongocxx::database &db) {
   mongocxx::collection users = db["users"];
   auto body = crow::json::load(req.body);
 
@@ -70,8 +70,8 @@ void handle_register(const crow::request& req, crow::response& res,
   return;
 }
 
-void handle_login(const crow::request& req, crow::response& res,
-                  mongocxx::database& db) {
+void handle_login(const crow::request &req, crow::response &res,
+                  mongocxx::database &db) {
   mongocxx::collection users = db["users"];
   auto body = crow::json::load(req.body);
 
@@ -129,8 +129,8 @@ void handle_login(const crow::request& req, crow::response& res,
   return;
 }
 
-crow::response handle_me(const crow::request& req, mongocxx::database& db) {
-  const char* jwt_secret = getenv("JWT_SECRET");
+crow::response handle_me(const crow::request &req, mongocxx::database &db) {
+  const char *jwt_secret = getenv("JWT_SECRET");
 
   crow::response res;
 
@@ -170,7 +170,7 @@ crow::response handle_me(const crow::request& req, mongocxx::database& db) {
     res = crow::response{json_res};
     return res;
 
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     res.code = 401;
     res.body = std::string("Invalid token: ") + e.what();
     return res;
