@@ -14,7 +14,8 @@ void register_auth_routes(crow::App<crow::CORSHandler>& app, mongocxx::database&
     CROW_ROUTE(app, "/user/me").methods("GET"_method)([&db](const crow::request& req) {
         return handle_me(req, db);
     });
-    CROW_ROUTE(app, "/user/update_metamask_account").methods("POST"_method)([&db](const crow::request& req, crow::response& res) {
-        handle_update_metamask(req, res, db);
+    
+    CROW_ROUTE(app, "/user/update_wallet").methods("POST"_method)([&db](const crow::request& req, crow::response& res) {
+        handle_update_wallet_address(req, res, db);
     });
 }

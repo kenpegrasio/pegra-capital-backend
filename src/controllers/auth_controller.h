@@ -22,5 +22,5 @@ void handle_register(const crow::request& req, crow::response& res,
 void handle_login(const crow::request& req, crow::response& res,
                   mongocxx::database& db);
 crow::response handle_me(const crow::request& req, mongocxx::database& db);
-void handle_update_metamask(const crow::request& req, crow::response& res,
-                            mongocxx::database& db);
+void handle_update_wallet_address(const crow::request& req, crow::response& res,
+                                  mongocxx::database& db);

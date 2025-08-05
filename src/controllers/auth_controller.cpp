@@ -60,12 +60,9 @@ void handle_register(const crow::request& req, crow::response& res,
     return;
   }
 
-  users.insert_one(make_document(
-      kvp("username", username), kvp("email", email),
-      kvp("password", hashed_password), kvp("name", name),
-      kvp("metamask_account", ""),
-      kvp("wallet_provider",
-          make_document(kvp("uuid", ""), kvp("name", ""), kvp("icon", "")))));
+  users.insert_one(make_document(kvp("username", username), kvp("email", email),
+                                 kvp("password", hashed_password),
+                                 kvp("name", name), kvp("wallet_address", "")));
 
   res.code = 201;
   res.body = "User registered successfully.";
@@ -165,21 +162,11 @@ crow::response handle_me(const crow::request& req, mongocxx::database& db) {
     auto view = user->view();
     crow::json::wvalue json_res;
 
-    auto wallet_provider_doc = view["wallet_provider"].get_document().value;
-    crow::json::wvalue json_provider;
-    json_provider["uuid"] =
-        wallet_provider_doc["uuid"].get_string().value.to_string();
-    json_provider["name"] =
-        wallet_provider_doc["name"].get_string().value.to_string();
-    json_provider["icon"] =
-        wallet_provider_doc["icon"].get_string().value.to_string();
-
     json_res["email"] = view["email"].get_string().value.to_string();
     json_res["username"] = view["username"].get_string().value.to_string();
     json_res["name"] = view["name"].get_string().value.to_string();
-    json_res["metamask_account"] =
-        view["metamask_account"].get_string().value.to_string();
-    json_res["wallet_provider"] = std::move(json_provider);
+    json_res["wallet_address"] =
+        view["wallet_address"].get_string().value.to_string();
 
     res = crow::response{json_res};
     return res;
@@ -191,8 +178,8 @@ crow::response handle_me(const crow::request& req, mongocxx::database& db) {
   }
 }
 
-void handle_update_metamask(const crow::request& req, crow::response& res,
-                            mongocxx::database& db) {
+void handle_update_wallet_address(const crow::request& req, crow::response& res,
+                                  mongocxx::database& db) {
   mongocxx::collection users = db["users"];
   auto body = crow::json::load(req.body);
 
@@ -203,18 +190,9 @@ void handle_update_metamask(const crow::request& req, crow::response& res,
     return;
   }
 
-  if (!body.has("metamask_account")) {
+  if (!body.has("wallet_address")) {
     res.code = 400;
-    res.body = "Missing Metamask Account Information";
-    res.end();
-    return;
-  }
-
-  if (!body.has("wallet_provider") || !body["wallet_provider"].has("uuid") ||
-      !body["wallet_provider"].has("name") ||
-      !body["wallet_provider"].has("icon")) {
-    res.code = 400;
-    res.body = "Missing or incomplete wallet_provider information";
+    res.body = "Missing Wallet Address Information";
     res.end();
     return;
   }
@@ -255,27 +233,17 @@ void handle_update_metamask(const crow::request& req, crow::response& res,
     auto update =
         bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
             "$set",
-            bsoncxx::builder::basic::make_document(
-                bsoncxx::builder::basic::kvp("metamask_account",
-                                             body["metamask_account"].s()),
-                bsoncxx::builder::basic::kvp(
-                    "wallet_provider",
-                    bsoncxx::builder::basic::make_document(
-                        bsoncxx::builder::basic::kvp(
-                            "uuid", body["wallet_provider"]["uuid"].s()),
-                        bsoncxx::builder::basic::kvp(
-                            "name", body["wallet_provider"]["name"].s()),
-                        bsoncxx::builder::basic::kvp(
-                            "icon", body["wallet_provider"]["icon"].s()))))));
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
+                "wallet_address", body["wallet_address"].s()))));
 
     auto result = users.update_one(user_filter.view(), update.view());
 
     if (result && result->modified_count() > 0) {
       res.code = 200;
-      res.body = "Metamask account updated successfully";
+      res.body = "Wallet address updated successfully";
     } else {
       res.code = 200;
-      res.body = "Metamask account already up-to-date";
+      res.body = "Wallet address already up-to-date";
     }
     res.end();
     return;
