@@ -16,7 +16,7 @@ include(FetchContent)
 
 FetchContent_Declare(Crow
     GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
-    GIT_TAG v1.2.1
+    GIT_TAG master
 )
 FetchContent_MakeAvailable(Crow)
 
@@ -58,6 +58,7 @@ target_include_directories(Pegra PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bcrypt
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bcrypt/crypt_blowfish
+    $<TARGET_PROPERTY:Crow::Crow,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(Pegra
